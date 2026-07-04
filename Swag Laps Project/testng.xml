@@ -1,0 +1,24 @@
+<!DOCTYPE suite SYSTEM "https://testng.org/testng-1.0.dtd">
+
+<suite name="SwagLabs Suite">
+
+    <listeners>
+        <listener class-name="Utilities.Listener" />
+    </listeners>
+
+    <test name="Regression Tests">
+
+        <classes>
+
+            <class name="TestCases.LoginPageTestCases"/>
+            <class name="TestCases.ProductListPage_TestCases"/>
+            <class name="TestCases.ProductDetailsPage_TestCases"/>
+            <class name="TestCases.CartPage_TestCases"/>
+            <class name="TestCases.CheckoutStepOne_TestCases"/>
+            <class name="TestCases.CheckoutStepTwo_TestCases"/>
+
+        </classes>
+
+    </test>
+
+</suite>
