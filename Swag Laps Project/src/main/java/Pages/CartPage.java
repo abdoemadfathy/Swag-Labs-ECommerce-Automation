@@ -25,7 +25,7 @@ public class CartPage {
 
     // جلب نص عنوان الصفحة الحالي ( Your Cart)
     public String getPageTitleText() {
-        return driver.findElement(cartPageTitle).getText();
+        return Wait.text(driver, cartPageTitle);
     }
 
     // جلب اسم المنتج الموجود داخل السلة بناءً على الـ index
@@ -50,12 +50,12 @@ public class CartPage {
 
     // الضغط على زر Continue Shopping للعودة لصفحة المنتجات
     public void clickContinueShopping() {
-        driver.findElement(continueShoppingButton).click();
+        Wait.click(driver, continueShoppingButton);
     }
 
     // الضغط على زر Checkout لبدء إتمام الشراء
     public void clickCheckoutButton() {
-        driver.findElement(checkoutButton).click();
+        Wait.click(driver, checkoutButton);
     }
 
     // دالة ترجع عدد المنتجات المعروضة حالياً داخل السلة

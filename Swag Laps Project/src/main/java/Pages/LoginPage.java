@@ -33,7 +33,7 @@ public class LoginPage
 
     // الضغط على زر الدخول
     public void clickLoginButton() {
-        driver.findElement(loginButton).click();
+        Wait.click(driver, loginButton);
     }
 
     /**
@@ -47,13 +47,13 @@ public class LoginPage
 
     // جلب نص عنوان صفحة المنتجات للتأكد من نجاح الدخول
     public String getProductsText() {
-        return driver.findElement(productsHeaderTitle).getText();
+        return Wait.text(driver, productsHeaderTitle);
     }
 
     /**
      * دالة موحدة لجلب أي رسالة خطأ تظهر في الصفحة
      */
     public String getErrorMessageText() {
-        return driver.findElement(errorMessageContainer).getText();
+        return Wait.text(driver, errorMessageContainer);
     }
 }

@@ -27,7 +27,7 @@ public class CheckoutStepOnePage {
     // 2. Methods (Actions)
 
     public String getPageTitleText() {
-        return driver.findElement(pageTitle).getText();
+        return Wait.text(driver, pageTitle);
     }
 
     public void enterFirstName(String firstName) {
@@ -53,15 +53,15 @@ public class CheckoutStepOnePage {
     }
 
     public void clickCancel() {
-        driver.findElement(cancelButton).click();
+        Wait.click(driver, cancelButton);
     }
 
     public void clickContinue() {
-        driver.findElement(continueButton).click();
+        Wait.click(driver, continueButton);
     }
 
     // جلب نص رسالة الخطأ الظاهرة
     public String getErrorMessageText() {
-        return driver.findElement(errorText).getText();
+        return Wait.text(driver, errorText);
     }
 }

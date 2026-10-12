@@ -28,27 +28,27 @@ public class ProductDetailsPage {
 
     // جلب اسم المنتج الحالي
     public String getProductName() {
-        return driver.findElement(productNameTitle).getText();
+        return Wait.text(driver, productNameTitle);
     }
 
     // جلب وصف المنتج
     public String getProductDescription() {
-        return driver.findElement(productDescriptionText).getText();
+        return Wait.text(driver, productDescriptionText);
     }
 
     // جلب سعر المنتج
     public String getProductPrice() {
-        return driver.findElement(productPriceLabel).getText();
+        return Wait.text(driver, productPriceLabel);
     }
 
     // الضغط على Add to cart
     public void clickAddToCartButton() {
-        driver.findElement(addToCartButton).click();
+        Wait.click(driver, addToCartButton);
     }
 
     // الضغط على Remove
     public void clickRemoveButton() {
-        driver.findElement(removeButton).click();
+        Wait.click(driver, removeButton);
     }
 
     // جلب نص زرار الـ Remove للتأكد من التحول
@@ -61,11 +61,11 @@ public class ProductDetailsPage {
 
     // الضغط على زرار العودة للخلف Back to products
     public void clickBackToProducts() {
-        driver.findElement(backToProductsButton).click();
+        Wait.click(driver, backToProductsButton);
     }
 
     // جلب رقم السلة (العداد)
     public String getCartBadgeText() {
-        return driver.findElement(cartBadgeCounter).getText();
+        return Wait.text(driver, cartBadgeCounter);
     }
 }

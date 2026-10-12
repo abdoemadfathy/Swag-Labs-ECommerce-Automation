@@ -47,7 +47,7 @@ public class ProductListPage {
 
     // جلب الرقم (العدد) الظاهر على أيقونة السلة
     public String getCartBadgeText() {
-        return driver.findElement(cartBadgeLocator).getText();
+        return Wait.text(driver, cartBadgeLocator);
     }
 
     // داله  تختار الترتيب بناءً على النص اللي هتبعته ليها
@@ -61,13 +61,19 @@ public class ProductListPage {
     // استدعاء اول اسم منتج بعد الترتيب من Z الى A
     public String getFirstProductName()
     {
-       return driver.findElement(firstProductLocator_A_To_Z).getText();
+       return Wait.text(driver, firstProductLocator_A_To_Z);
     }
 
     // الضغط ع ايقونة السلة
     public void clickOnCartIcon()
     {
-        driver.findElement(CartIconLocator).click();
+        // Retry until the cart page is open: a click right after "Add to cart" can be lost while the page re-renders.
+        new org.openqa.selenium.support.ui.WebDriverWait(driver, java.time.Duration.ofSeconds(10))
+                .ignoring(org.openqa.selenium.StaleElementReferenceException.class)
+                .until(d -> {
+                    d.findElement(CartIconLocator).click();
+                    return d.getCurrentUrl().contains("cart.html");
+                });
     }
 
 }
