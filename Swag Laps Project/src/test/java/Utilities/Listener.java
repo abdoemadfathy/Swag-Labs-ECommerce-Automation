@@ -9,6 +9,7 @@ import com.aventstack.extentreports.reporter.configuration.Theme;
 import org.openqa.selenium.OutputType;
 import org.openqa.selenium.TakesScreenshot;
 import org.openqa.selenium.io.FileHandler;
+import org.testng.IConfigurationListener;
 import org.testng.ITestContext;
 import org.testng.ITestListener;
 import org.testng.ITestResult;
@@ -17,16 +18,16 @@ import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
-public class Listener implements ITestListener {
+public class Listener implements ITestListener, IConfigurationListener {
 
-    // المتغيرات الاستاتيكية بالطريقة التي طلبتها
     private static ExtentReports extentReports;
-    private static ExtentTest extentTest;
+    // ThreadLocal عشان كل thread يشتغل على الـ ExtentTest بتاعه (آمن لو اتفعل التشغيل المتوازي)
+    private static final ThreadLocal<ExtentTest> extentTest = new ThreadLocal<>();
 
     /**
      * ميثود مستقلة لإنشاء وإعداد التقرير بخصائص بروفيشنال
      */
-    public static ExtentReports createReport() {
+    public static synchronized ExtentReports createReport() {
         if (extentReports == null) {
             String timestamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
             String reportPath = System.getProperty("user.dir") + "/Reports/ExecutionReport_" + timestamp + ".html";
@@ -47,6 +48,8 @@ public class Listener implements ITestListener {
             extentReports.setSystemInfo("Environment", "QA");
             extentReports.setSystemInfo("QA Engineer", "Abdulrahman Emad");
             extentReports.setSystemInfo("OS", System.getProperty("os.name"));
+            extentReports.setSystemInfo("Browser", System.getProperty("browser", "chrome"));
+            extentReports.setSystemInfo("Headless", System.getProperty("headless", "false"));
         }
         return extentReports;
     }
@@ -60,30 +63,55 @@ public class Listener implements ITestListener {
     @Override
     public void onTestStart(ITestResult result) {
         // إنشاء خطوة اختبار جديدة لكل تست كيس تبدأ
-        extentTest = extentReports.createTest(result.getName());
-        extentTest.log(Status.INFO, "Test Case '" + result.getName() + "' execution started.");
+        ExtentTest test = extentReports.createTest(result.getName());
+        extentTest.set(test);
+        test.log(Status.INFO, "Test Case '" + result.getName() + "' execution started.");
     }
 
     @Override
     public void onTestSuccess(ITestResult result) {
-        extentTest.log(Status.PASS, "Test Case '" + result.getName() + "' PASSED.");
+        extentTest.get().log(Status.PASS, "Test Case '" + result.getName() + "' PASSED.");
+        extentTest.remove();
     }
 
     @Override
     public void onTestFailure(ITestResult result) {
-        extentTest.log(Status.FAIL, "Test Case '" + result.getName() + "' FAILED.");
-        extentTest.log(Status.FAIL, "Failure Reason: " + result.getThrowable().getMessage());
+        ExtentTest test = extentTest.get();
+        test.log(Status.FAIL, "Test Case '" + result.getName() + "' FAILED.");
+        test.log(Status.FAIL, "Failure Reason: " + describe(result.getThrowable()));
 
         // التقاط الصورة وربطها بالتقرير
         String screenshotPath = captureScreenshot(result.getName());
         if (screenshotPath != null) {
-            extentTest.addScreenCaptureFromPath(screenshotPath);
+            test.addScreenCaptureFromPath(screenshotPath);
         }
+        extentTest.remove();
     }
 
     @Override
     public void onTestSkipped(ITestResult result) {
-        extentTest.log(Status.SKIP, "Test Case '" + result.getName() + "' SKIPPED.");
+        // لو الـ test اتعمله skip قبل ما يبدأ (مثلاً بسبب فشل الـ setUp) مفيش ExtentTest له لسه
+        ExtentTest test = extentTest.get();
+        if (test == null) {
+            test = extentReports.createTest(result.getName());
+        }
+        test.log(Status.SKIP, "Test Case '" + result.getName() + "' SKIPPED."
+                + (result.getThrowable() != null ? " Reason: " + describe(result.getThrowable()) : ""));
+        extentTest.remove();
+    }
+
+    // فشل الـ @BeforeMethod / @AfterMethod كان بيتعمل منه skip للـ tests من غير ما يتسجل السبب في التقرير
+    @Override
+    public void onConfigurationFailure(ITestResult result) {
+        ExtentTest test = extentReports.createTest("Configuration failure: " + result.getMethod().getMethodName());
+        test.log(Status.FAIL, "Configuration method '" + result.getMethod().getMethodName()
+                + "' in " + result.getTestClass().getName() + " FAILED.");
+        test.log(Status.FAIL, "Failure Reason: " + describe(result.getThrowable()));
+
+        String screenshotPath = captureScreenshot("config_" + result.getMethod().getMethodName());
+        if (screenshotPath != null) {
+            test.addScreenCaptureFromPath(screenshotPath);
+        }
     }
 
     @Override
@@ -92,6 +120,10 @@ public class Listener implements ITestListener {
         if (extentReports != null) {
             extentReports.flush();
         }
+    }
+
+    private static String describe(Throwable throwable) {
+        return throwable == null ? "no exception recorded" : String.valueOf(throwable.getMessage());
     }
 
     // ميثود مساعدة لالتقاط السكرين شوت وحفظها
