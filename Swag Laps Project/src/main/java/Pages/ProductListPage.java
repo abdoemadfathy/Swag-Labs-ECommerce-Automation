@@ -67,13 +67,22 @@ public class ProductListPage {
     // الضغط ع ايقونة السلة
     public void clickOnCartIcon()
     {
-        // Retry until the cart page is open: a click right after "Add to cart" can be lost while the page re-renders.
-        new org.openqa.selenium.support.ui.WebDriverWait(driver, java.time.Duration.ofSeconds(10))
+        // Retry until the cart page is open: a click right after "Add to cart" can be lost while the page
+        // re-renders. Every other attempt falls back to a script click.
+        int[] attempt = {0};
+        new org.openqa.selenium.support.ui.WebDriverWait(driver, java.time.Duration.ofSeconds(15))
                 .ignoring(org.openqa.selenium.StaleElementReferenceException.class)
                 .until(d -> {
-                    d.findElement(CartIconLocator).click();
+                    WebElement icon = d.findElement(CartIconLocator);
+                    if (attempt[0]++ % 2 == 0) {
+                        icon.click();
+                    } else {
+                        ((org.openqa.selenium.JavascriptExecutor) d).executeScript("arguments[0].click();", icon);
+                    }
                     return d.getCurrentUrl().contains("cart.html");
                 });
+    }
+);
     }
 
 }
