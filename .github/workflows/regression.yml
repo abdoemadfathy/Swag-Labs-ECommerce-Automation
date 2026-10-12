@@ -39,7 +39,7 @@ jobs:
         shell: bash
         run: |
           xvfb-run --auto-servernum --server-args="-screen 0 1920x1080x24" \
-            mvn -B -ntp test -Dsurefire.suiteXmlFiles=testng.xml 2>&1 | tee mvn.log
+            mvn -B -ntp test 2>&1 | tee mvn.log
 
       - name: Diagnostics
         if: always()
