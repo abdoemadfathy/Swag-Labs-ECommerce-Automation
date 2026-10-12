@@ -3,9 +3,7 @@ package Pages;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 
-public class ProductDetailsPage {
-
-    private final WebDriver driver;
+public class ProductDetailsPage extends BasePage {
 
     // 1. Locators (Enterprise Style using data-test attributes)
     private final By productNameTitle = By.xpath("//div[contains(@data-test, 'inventory-item-name')]");
@@ -18,48 +16,63 @@ public class ProductDetailsPage {
 
     // Constructor
     public ProductDetailsPage(WebDriver driver) {
-        this.driver = driver;
+        super(driver);
     }
 
     // 2. Methods (Actions)
 
+    // انتظار الوصول لصفحة تفاصيل المنتج (نفس الـ data-test للاسم موجود في صفحة القائمة)
+    public void waitForPage() {
+        waitForUrlContains("/inventory-item.html");
+    }
+
     // جلب اسم المنتج الحالي
     public String getProductName() {
-        return driver.findElement(productNameTitle).getText();
+        return getText(productNameTitle);
     }
 
     // جلب وصف المنتج
     public String getProductDescription() {
-        return driver.findElement(productDescriptionText).getText();
+        return getText(productDescriptionText);
     }
 
     // جلب سعر المنتج
     public String getProductPrice() {
-        return driver.findElement(productPriceLabel).getText();
+        return getText(productPriceLabel);
     }
 
     // الضغط على Add to cart
     public void clickAddToCartButton() {
-        driver.findElement(addToCartButton).click();
+        click(addToCartButton);
     }
 
     // الضغط على Remove
     public void clickRemoveButton() {
-        driver.findElement(removeButton).click();
+        click(removeButton);
     }
 
     // جلب نص زرار الـ Remove للتأكد من التحول
     public String getRemoveButtonText() {
-        return driver.findElement(removeButton).getText();
+        return getText(removeButton);
+    }
+
+    // هل زر Add to cart ظاهر (يعني المنتج مش في السلة)
+    public boolean isAddToCartButtonDisplayed() {
+        return waitForVisible(addToCartButton).isDisplayed();
     }
 
     // الضغط على زرار العودة للخلف Back to products
     public void clickBackToProducts() {
-        driver.findElement(backToProductsButton).click();
+        click(backToProductsButton);
     }
 
     // جلب رقم السلة (العداد)
     public String getCartBadgeText() {
-        return driver.findElement(cartBadgeCounter).getText();
+        return getText(cartBadgeCounter);
+    }
+
+    // هل عداد السلة اختفى (السلة فاضية)
+    public boolean isCartBadgeAbsent() {
+        return waitForInvisibility(cartBadgeCounter);
     }
 }

@@ -3,9 +3,7 @@ package Pages;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 
-public class CartPage {
-
-    private final WebDriver driver;
+public class CartPage extends BasePage {
 
     // 1. Locators (Enterprise Style using data-test)
     private final By cartPageTitle = By.className("title"); // للتأكد أننا في صفحة Your Cart
@@ -18,44 +16,49 @@ public class CartPage {
 
     // Constructor
     public CartPage(WebDriver driver) {
-        this.driver = driver;
+        super(driver);
     }
 
     // 2. Methods (Actions)
 
+    // انتظار الوصول لصفحة السلة (الـ title class موجود في أكثر من صفحة فلازم نتأكد من الـ URL الأول)
+    public void waitForPage() {
+        waitForUrlContains("/cart.html");
+    }
+
     // جلب نص عنوان الصفحة الحالي ( Your Cart)
     public String getPageTitleText() {
-        return driver.findElement(cartPageTitle).getText();
+        return getText(cartPageTitle);
     }
 
     // جلب اسم المنتج الموجود داخل السلة بناءً على الـ index
     public String getCartItemNameText(int index) {
-        return driver.findElements(cartItemName).get(index).getText();
+        return getTextAt(cartItemName, index);
     }
 
     // جلب سعر المنتج داخل السلة بناءً على الـ index
     public String getCartItemPriceText(int index) {
-        return driver.findElements(cartItemPrice).get(index).getText();
+        return getTextAt(cartItemPrice, index);
     }
 
     // جلب كمية المنتج داخل السلة (المتوقع "1")
     public String getCartItemQuantityText(int index) {
-        return driver.findElements(cartItemQuantity).get(index).getText();
+        return getTextAt(cartItemQuantity, index);
     }
 
     // الضغط على زر Remove لإزالة منتج معين من داخل السلة
     public void clickRemoveButton(int index) {
-        driver.findElements(removeButton).get(index).click();
+        clickElementAt(removeButton, index);
     }
 
     // الضغط على زر Continue Shopping للعودة لصفحة المنتجات
     public void clickContinueShopping() {
-        driver.findElement(continueShoppingButton).click();
+        click(continueShoppingButton);
     }
 
     // الضغط على زر Checkout لبدء إتمام الشراء
     public void clickCheckoutButton() {
-        driver.findElement(checkoutButton).click();
+        click(checkoutButton);
     }
 
     // دالة ترجع عدد المنتجات المعروضة حالياً داخل السلة

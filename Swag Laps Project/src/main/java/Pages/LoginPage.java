@@ -3,10 +3,8 @@ package Pages;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 
-public class LoginPage
+public class LoginPage extends BasePage
 {
-    private final WebDriver driver;
-
     // Locators
     private final By userNameField = By.id("user-name");
     private final By passwordField = By.id("password");
@@ -16,24 +14,24 @@ public class LoginPage
 
     // Constructor
     public LoginPage(WebDriver driver) {
-        this.driver = driver;
+        super(driver);
     }
 
     // Actions (Methods)
 
     // كتابة اسم المستخدم
     public void enterUserName(String userName) {
-        driver.findElement(userNameField).sendKeys(userName);
+        type(userNameField, userName);
     }
 
     // كتابة كلمة المرور
     public void enterPassword(String password) {
-        driver.findElement(passwordField).sendKeys(password);
+        type(passwordField, password);
     }
 
     // الضغط على زر الدخول
     public void clickLoginButton() {
-        driver.findElement(loginButton).click();
+        click(loginButton);
     }
 
     /**
@@ -47,13 +45,13 @@ public class LoginPage
 
     // جلب نص عنوان صفحة المنتجات للتأكد من نجاح الدخول
     public String getProductsText() {
-        return driver.findElement(productsHeaderTitle).getText();
+        return getText(productsHeaderTitle);
     }
 
     /**
      * دالة موحدة لجلب أي رسالة خطأ تظهر في الصفحة
      */
     public String getErrorMessageText() {
-        return driver.findElement(errorMessageContainer).getText();
+        return getText(errorMessageContainer);
     }
 }

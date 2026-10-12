@@ -30,6 +30,7 @@ public class CartPage_TestCases extends BaseClass {
 
         // 3. الضغط على أيقونة عربة التسوق لفتح صفحة السلة
         productListPage.clickOnCartIcon();
+        cartPage.waitForPage();
     }
 
     @Test(priority = 1, description = "Verify that the user is successfully navigated to the Cart page")
@@ -40,13 +41,12 @@ public class CartPage_TestCases extends BaseClass {
     }
 
     @Test(priority = 2, description = "Verify that the added product details (Name, Price, Qty) are correct inside the cart")
-    public void verifyAddedProductDetailsInCart() throws InterruptedException {
+    public void verifyAddedProductDetailsInCart() {
         // الـ Assertions: التحقق من صحة البيانات المعروضة داخل السلة للمنتج الأول
         String actualName = cartPage.getCartItemNameText(0);
         String actualPrice = cartPage.getCartItemPriceText(0);
         String actualQty = cartPage.getCartItemQuantityText(0);
 
-        Thread.sleep(2000);
         Assert.assertEquals(actualName, "Sauce Labs Backpack", "Product name in cart is incorrect!");
         Assert.assertEquals(actualPrice, "$29.99", "Product price in cart is incorrect!");
         Assert.assertEquals(actualQty, "1", "Product quantity in cart is incorrect!");
@@ -60,7 +60,7 @@ public class CartPage_TestCases extends BaseClass {
         // 2. جلب عدد المنتجات المتبقية في السلة باستخدام الدالة الجديدة
         int actualItemsCount = cartPage.getCartItemsCount();
 
-        // 3. الـ Assertion الاحترافي: المتوقع إن العدد يكون 0 تماماً كصورة الشاشة الحالية
+        // 3. الـ Assertion الاحترافي: المتوقع إن العدد يكون 0 تماماً
         Assert.assertEquals(actualItemsCount, 0, "The cart is not empty after removing the product!");
 
         // 4. تأكيد إضافي (اختياري): التأكد أن النص الخاص بـ "Sauce Labs Backpack" مابقاش موجود في الصفحة
@@ -79,6 +79,7 @@ public class CartPage_TestCases extends BaseClass {
     @Test(priority = 5, description = "Verify that 'Continue Shopping' button takes the user back to the product list")
     public void verifyContinueShoppingNavigation() {
         cartPage.clickContinueShopping();
+        productListPage.waitForPage();
 
         // الـ Assertion: التأكد من العودة لصفحة المنتجات الرئيسية
         Assert.assertTrue(driver.getCurrentUrl().contains("/inventory.html"), "Continue Shopping didn't redirect correctly!");

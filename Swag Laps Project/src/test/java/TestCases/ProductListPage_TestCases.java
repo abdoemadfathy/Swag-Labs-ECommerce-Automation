@@ -23,6 +23,7 @@ public class ProductListPage_TestCases extends BaseClass
 
         // تسجيل دخول تلقائي قبل كل تست
         loginPage.Login("standard_user", "secret_sauce");
+        productListPage.waitForPage();
     }
 
     @Test(priority = 1 , description = "Verify that the Add to Cart button successfully")
@@ -52,6 +53,7 @@ public class ProductListPage_TestCases extends BaseClass
     @Test(priority = 3, description = "Verify click on product title lead to detail page")
     public void VerifyClickOnProductTitle() {
         productListPage.clickOnProductTitle(0);
+        productDetailsPage.waitForPage();
 
         String expectedResult = "Sauce Labs Backpack";
         String actualResult = productDetailsPage.getProductName();
@@ -83,7 +85,6 @@ public class ProductListPage_TestCases extends BaseClass
 
         // Assertion
         // 2. جلب اسم أول منتج ظهر في الصفحة بعد الترتيب
-        // (تأكد إن دالة productTitleLocator موجودة عندك وبتجيب أول منتج index 0)
         String actualFirstProduct = productListPage.getFirstProductName();
 
         // 3. الـ Assertion: المتوقع إن أول منتج يكون التيشرت الأحمر

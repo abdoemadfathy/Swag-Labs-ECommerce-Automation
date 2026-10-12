@@ -3,16 +3,14 @@ package Pages;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 
-public class CheckoutStepTwoPage {
-
-    private final WebDriver driver;
+public class CheckoutStepTwoPage extends BasePage {
 
     // 1. Locators
     private final By pageTitle = By.className("title"); // Checkout: Overview
     private final By itemName = By.xpath("//div[@data-test='inventory-item-name']");
     private final By itemPrice = By.xpath("//div[@data-test='inventory-item-price']");
 
-    // محددات معلومات الفاتورة والأسعار المعروضة في الصورة الثالثة
+    // محددات معلومات الفاتورة والأسعار المعروضة في صفحة Overview
     private final By paymentInfoValue = By.xpath("//div[@data-test='payment-info-value']");
     private final By shippingInfoValue = By.xpath("//div[@data-test='shipping-info-value']");
     private final By itemTotalLabel = By.className("summary_subtotal_label"); // Item total: $29.99
@@ -23,47 +21,53 @@ public class CheckoutStepTwoPage {
 
     // Constructor
     public CheckoutStepTwoPage(WebDriver driver) {
-        this.driver = driver;
+        super(driver);
     }
 
     // 2. Methods
+
+    // انتظار الوصول لصفحة Checkout Step Two (الـ id "cancel" موجود كمان في الخطوة الأولى)
+    public void waitForPage() {
+        waitForUrlContains("/checkout-step-two.html");
+    }
+
     public String getPageTitleText() {
-        return driver.findElement(pageTitle).getText();
+        return getText(pageTitle);
     }
 
     public String getItemNameText() {
-        return driver.findElement(itemName).getText();
+        return getText(itemName);
     }
 
     public String getItemPriceText() {
-        return driver.findElement(itemPrice).getText();
+        return getText(itemPrice);
     }
 
     public String getPaymentInfoValueText() {
-        return driver.findElement(paymentInfoValue).getText();
+        return getText(paymentInfoValue);
     }
 
     public String getShippingInfoValueText() {
-        return driver.findElement(shippingInfoValue).getText();
+        return getText(shippingInfoValue);
     }
 
     public String getItemTotalText() {
-        return driver.findElement(itemTotalLabel).getText();
+        return getText(itemTotalLabel);
     }
 
     public String getTaxText() {
-        return driver.findElement(taxLabel).getText();
+        return getText(taxLabel);
     }
 
     public String getTotalText() {
-        return driver.findElement(totalLabel).getText();
+        return getText(totalLabel);
     }
 
     public void clickCancel() {
-        driver.findElement(cancelButton).click();
+        click(cancelButton);
     }
 
     public void clickFinish() {
-        driver.findElement(finishButton).click();
+        click(finishButton);
     }
 }

@@ -25,6 +25,7 @@ public class ProductDetailsPage_TestCases extends BaseClass {
 
         // 2. الدخول لصفحة تفاصيل المنتج الأول (Index 0) لبدء الاختبارات عليها
         productListPage.clickOnProductTitle(0);
+        productDetailsPage.waitForPage();
     }
 
     @Test(priority = 1, description = "Verify that product basic details (Name, Price, Desc) are displayed correctly")
@@ -60,14 +61,16 @@ public class ProductDetailsPage_TestCases extends BaseClass {
         productDetailsPage.clickAddToCartButton();
         productDetailsPage.clickRemoveButton();
 
-        //  نكتفي بالتحقق أن الزر عاد لاسمه الأصلي لو أردنا
-        Assert.assertTrue(driver.getPageSource().contains("Add to cart"), "Button didn't reset to Add to cart!");
+        // التحقق أن الزر عاد لـ Add to cart وأن عداد السلة اختفى
+        Assert.assertTrue(productDetailsPage.isAddToCartButtonDisplayed(), "Button didn't reset to Add to cart!");
+        Assert.assertTrue(productDetailsPage.isCartBadgeAbsent(), "Cart badge is still displayed after removing the product!");
     }
 
     @Test(priority = 5, description = "Verify that 'Back to products' button navigates the user back to the main list")
     public void verifyBackToProductsNavigation() {
         // الضغط على زر الرجوع
         productDetailsPage.clickBackToProducts();
+        productListPage.waitForPage();
 
         // الـ Assertion: التأكد من العودة لصفحة المنتجات الرئيسية من خلال الـ URL
         String currentUrl = driver.getCurrentUrl();

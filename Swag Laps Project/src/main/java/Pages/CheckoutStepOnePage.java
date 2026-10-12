@@ -3,9 +3,7 @@ package Pages;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 
-public class CheckoutStepOnePage {
-
-    private final WebDriver driver;
+public class CheckoutStepOnePage extends BasePage {
 
     // 1. Locators (Enterprise Style using data-test or standard IDs)
     private final By pageTitle = By.className("title"); // للتأكد من العنوان Checkout: Your Information
@@ -15,34 +13,35 @@ public class CheckoutStepOnePage {
     private final By cancelButton = By.id("cancel");
     private final By continueButton = By.id("continue");
 
-    // محددات رسائل الخطأ (Negative Scenarios)
-    private final By errorMessageContainer = By.xpath("//div[contains(@class, 'error-message-container')]");
+    // محدد رسالة الخطأ (Negative Scenarios)
     private final By errorText = By.xpath("//h3[@data-test='error']");
 
     // Constructor
     public CheckoutStepOnePage(WebDriver driver) {
-        this.driver = driver;
+        super(driver);
     }
 
     // 2. Methods (Actions)
 
+    // انتظار الوصول لصفحة Checkout Step One
+    public void waitForPage() {
+        waitForUrlContains("/checkout-step-one.html");
+    }
+
     public String getPageTitleText() {
-        return driver.findElement(pageTitle).getText();
+        return getText(pageTitle);
     }
 
     public void enterFirstName(String firstName) {
-        driver.findElement(firstNameField).clear();
-        driver.findElement(firstNameField).sendKeys(firstName);
+        type(firstNameField, firstName);
     }
 
     public void enterLastName(String lastName) {
-        driver.findElement(lastNameField).clear();
-        driver.findElement(lastNameField).sendKeys(lastName);
+        type(lastNameField, lastName);
     }
 
     public void enterPostalCode(String postalCode) {
-        driver.findElement(postalCodeField).clear();
-        driver.findElement(postalCodeField).sendKeys(postalCode);
+        type(postalCodeField, postalCode);
     }
 
     // دالة مجمعة لتسهيل ملء البيانات دفعة واحدة
@@ -53,15 +52,15 @@ public class CheckoutStepOnePage {
     }
 
     public void clickCancel() {
-        driver.findElement(cancelButton).click();
+        click(cancelButton);
     }
 
     public void clickContinue() {
-        driver.findElement(continueButton).click();
+        click(continueButton);
     }
 
     // جلب نص رسالة الخطأ الظاهرة
     public String getErrorMessageText() {
-        return driver.findElement(errorText).getText();
+        return getText(errorText);
     }
 }
