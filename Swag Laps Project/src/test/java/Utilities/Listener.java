@@ -85,7 +85,11 @@ public class Listener implements ITestListener, org.testng.IConfigurationListene
     public void onConfigurationFailure(ITestResult result) {
         try {
             System.out.println("[CI-DEBUG] " + result.getName() + " url=" + BaseClass.driver.getCurrentUrl()
-                    + " body=" + BaseClass.driver.getPageSource().replaceAll("\\s+", " ").substring(0, 700));
+                    + " text=" + ((org.openqa.selenium.JavascriptExecutor) BaseClass.driver).executeScript(
+                            "return document.body.innerText.replace(/\\s+/g,' ').slice(0,500)")
+                    + " badges=" + BaseClass.driver.findElements(org.openqa.selenium.By.className("shopping_cart_badge")).size()
+                    + " cartLinks=" + BaseClass.driver.findElements(org.openqa.selenium.By.className("shopping_cart_link")).size()
+                    + " win=" + BaseClass.driver.manage().window().getSize());
         } catch (Exception e) {
             System.out.println("[CI-DEBUG] " + e);
         }
