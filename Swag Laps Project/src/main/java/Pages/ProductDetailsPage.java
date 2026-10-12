@@ -1,7 +1,10 @@
 package Pages;
 
 import org.openqa.selenium.By;
+import org.openqa.selenium.StaleElementReferenceException;
 import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.support.ui.WebDriverWait;
+import java.time.Duration;
 
 public class ProductDetailsPage {
 
@@ -50,7 +53,10 @@ public class ProductDetailsPage {
 
     // جلب نص زرار الـ Remove للتأكد من التحول
     public String getRemoveButtonText() {
-        return driver.findElement(removeButton).getText();
+        // The button is re-rendered after "Add to cart", so retry if the element goes stale.
+        return new WebDriverWait(driver, Duration.ofSeconds(10))
+                .ignoring(StaleElementReferenceException.class)
+                .until(d -> d.findElement(removeButton).getText());
     }
 
     // الضغط على زرار العودة للخلف Back to products
