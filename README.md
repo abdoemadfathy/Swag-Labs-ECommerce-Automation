@@ -49,6 +49,12 @@ mvn test -Dbrowser=firefox
 
 ---
 
+## Continuous integration
+
+`.github/workflows/ci.yml` runs `mvn test -Dheadless=true` on Java 17 for every pull request and push to `main`, and uploads the Extent report, screenshots and Surefire reports as the `test-reports` artifact.
+
+---
+
 ## Reports
 
 After a run, an HTML report is written to `Swag Laps Project/Reports/ExecutionReport_<timestamp>.html`. Failures (including failures in setup methods) are logged with the error message and a screenshot saved under `Swag Laps Project/Screenshots/`. Both folders are git-ignored.
@@ -88,5 +94,4 @@ Swag Laps Project/
 ## Known limitations
 
 * Only the `standard_user` and `locked_out_user` accounts are covered; there is no `problem_user` or `performance_glitch_user` scenario yet.
-* There is no CI workflow in the repository yet.
 * Tests run sequentially; the shared static driver in `BaseClass` would need to become thread-local before enabling parallel execution.

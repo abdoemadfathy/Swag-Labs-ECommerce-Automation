@@ -1,0 +1,45 @@
+name: UI Tests
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    defaults:
+      run:
+        working-directory: Swag Laps Project
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+          cache: maven
+          cache-dependency-path: Swag Laps Project/pom.xml
+
+      # Google Chrome is preinstalled on ubuntu-latest; Selenium Manager fetches the matching driver.
+      - name: Run tests (headless Chrome)
+        run: mvn -B test -Dheadless=true
+
+      - name: Upload Extent report and screenshots
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-reports
+          path: |
+            Swag Laps Project/Reports/
+            Swag Laps Project/Screenshots/
+            Swag Laps Project/target/surefire-reports/
+          if-no-files-found: warn
