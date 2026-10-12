@@ -32,14 +32,12 @@ jobs:
           java-version: "17"
           cache: maven
 
-      # The suite starts a normal (headed) Chrome, so it runs inside a virtual display.
       - name: Run the TestNG suite
         id: run
         continue-on-error: true
         shell: bash
         run: |
-          xvfb-run --auto-servernum --server-args="-screen 0 1920x1080x24" \
-            mvn -B -ntp test 2>&1 | tee mvn.log
+          mvn -B -ntp test 2>&1 | tee mvn.log
 
       - name: Diagnostics
         if: always()

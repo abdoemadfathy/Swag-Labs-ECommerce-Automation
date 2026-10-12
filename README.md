@@ -63,7 +63,7 @@ src/
 
 The suite runs on GitHub Actions for every push and pull request, and every Monday. The workflow ([`regression.yml`](.github/workflows/regression.yml)):
 
-1. Sets up Java 17 and runs `mvn test` (the pom points Surefire at `testng.xml`) inside a virtual display, so the existing headed Chrome tests need no code change.
+1. Sets up Java 17 and runs `mvn test` (the pom points Surefire at `testng.xml`). When `CI` is set, `BaseClass` starts Chrome headless; locally it still opens a visible, maximized browser.
 2. Reads the TestNG results and writes a `summary.json` (passed, failed, skipped, duration, run link).
 3. Uploads the Extent report, screenshots, and raw results as the `test-report` artifact.
 4. On `main` and scheduled runs, commits the latest `summary.json` to the `ci-results` branch, which the portfolio site reads to show the latest result.
