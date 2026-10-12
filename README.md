@@ -1,5 +1,8 @@
 # Swag Labs UI Automation Framework 
 
+[![Regression suite](https://github.com/abdoemadfathy/Swag-Labs-ECommerce-Automation/actions/workflows/regression.yml/badge.svg)](https://github.com/abdoemadfathy/Swag-Labs-ECommerce-Automation/actions/workflows/regression.yml)
+
+
 A production-ready, enterprise-grade **End-to-End (E2E) Automation Testing Framework** built to validate the core business workflows of the Swag Labs e-commerce platform. This project leverages the **Page Object Model (POM)** design pattern to ensure high maintainability, scalability, and clean separation of concerns.
 
 ---
@@ -53,3 +56,16 @@ src/
     │   ├── ProductListPage_TestCases.java
     │   └── ProductDetailsPage_TestCases.java
     └── Utilities/          # Enterprise test listeners and custom configuration utilities
+
+---
+
+## Continuous Integration
+
+The suite runs on GitHub Actions for every push and pull request, and every Monday. The workflow ([`regression.yml`](.github/workflows/regression.yml)):
+
+1. Sets up Java 17 and runs `mvn test -Dsurefire.suiteXmlFiles=testng.xml` inside a virtual display, so the existing headed Chrome tests need no code change.
+2. Reads the TestNG results and writes a `summary.json` (passed, failed, skipped, duration, run link).
+3. Uploads the Extent report, screenshots, and raw results as the `test-report` artifact.
+4. On `main` and scheduled runs, commits the latest `summary.json` to the `ci-results` branch, which the portfolio site reads to show the latest result.
+
+Run it by hand from the **Actions** tab with **Run workflow**.

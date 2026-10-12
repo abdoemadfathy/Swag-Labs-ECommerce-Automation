@@ -1,0 +1,128 @@
+name: Regression suite
+
+on:
+  push:
+    branches: [main, "ci/**"]
+  pull_request:
+  schedule:
+    - cron: "0 6 * * 1" # Mondays, 06:00 UTC
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: regression-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  test:
+    name: Selenium + TestNG
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    defaults:
+      run:
+        working-directory: "Swag Laps Project"
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "17"
+          cache: maven
+
+      # The suite starts a normal (headed) Chrome, so it runs inside a virtual display.
+      - name: Run the TestNG suite
+        id: run
+        continue-on-error: true
+        run: >
+          xvfb-run --auto-servernum --server-args="-screen 0 1920x1080x24"
+          mvn -B -ntp test -Dsurefire.suiteXmlFiles=testng.xml
+
+      - name: Summarise results
+        if: always()
+        shell: python
+        run: |
+          import glob, json, os
+          import xml.etree.ElementTree as ET
+
+          files = glob.glob("target/surefire-reports/testng-results.xml")
+          if not files:
+              raise SystemExit("No TestNG results were produced")
+          root = ET.parse(files[0]).getroot()
+          total, passed, failed, skipped = (int(root.get(k, 0)) for k in ("total", "passed", "failed", "skipped"))
+          suite = root.find(".//suite")
+          duration = int(suite.get("duration-ms", 0)) if suite is not None else 0
+          server = os.environ["GITHUB_SERVER_URL"]
+          repo = os.environ["GITHUB_REPOSITORY"]
+          summary = {
+              "schemaVersion": 1,
+              "suite": "SwagLabs Suite",
+              "total": total,
+              "passed": passed,
+              "failed": failed,
+              "skipped": skipped,
+              "status": "passed" if failed == 0 and passed > 0 else "failed",
+              "durationMs": duration,
+              "finishedAt": __import__("datetime").datetime.now(__import__("datetime").timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
+              "commit": os.environ["GITHUB_SHA"][:7],
+              "branch": os.environ["GITHUB_REF_NAME"],
+              "event": os.environ["GITHUB_EVENT_NAME"],
+              "runUrl": f"{server}/{repo}/actions/runs/{os.environ['GITHUB_RUN_ID']}",
+          }
+          with open("../summary.json", "w") as f:
+              json.dump(summary, f, indent=2)
+          print(json.dumps(summary, indent=2))
+          with open(os.environ["GITHUB_STEP_SUMMARY"], "a") as f:
+              f.write(f"### {summary['suite']}\n\n| Passed | Failed | Skipped | Total |\n|---|---|---|---|\n| {passed} | {failed} | {skipped} | {total} |\n")
+
+      - name: Upload report and results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-report
+          path: |
+            Swag Laps Project/Reports
+            Swag Laps Project/Screenshots
+            Swag Laps Project/target/surefire-reports
+            summary.json
+          if-no-files-found: warn
+
+      - name: Fail the job if the suite failed
+        if: steps.run.outcome == 'failure'
+        run: exit 1
+
+  publish:
+    name: Publish latest result
+    needs: test
+    if: always() && needs.test.result != 'skipped' && github.event_name != 'pull_request'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: test-report
+          path: artifact
+
+      # The portfolio reads summary.json from this branch (raw.githubusercontent.com allows cross-origin reads).
+      - name: Commit summary.json to the ci-results branch
+        run: |
+          set -e
+          SUMMARY="$(find artifact -name summary.json | head -1)"
+          [ -n "$SUMMARY" ] || { echo "No summary.json found"; exit 1; }
+          mkdir pub && cp "$SUMMARY" pub/summary.json && cd pub
+          git init -q
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git remote add origin "https://x-access-token:${{ github.token }}@github.com/${{ github.repository }}.git"
+          if git fetch -q --depth=1 origin ci-results; then
+            git checkout -q -b ci-results FETCH_HEAD
+            cp ../"$SUMMARY" summary.json
+          else
+            git checkout -q --orphan ci-results
+          fi
+          git add summary.json
+          git commit -q -m "Update CI summary" || { echo "No change"; exit 0; }
+          git push -q origin ci-results
