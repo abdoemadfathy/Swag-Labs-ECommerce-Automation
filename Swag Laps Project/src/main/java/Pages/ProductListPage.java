@@ -82,7 +82,5 @@ public class ProductListPage {
                     return d.getCurrentUrl().contains("cart.html");
                 });
     }
-);
-    }
 
 }
