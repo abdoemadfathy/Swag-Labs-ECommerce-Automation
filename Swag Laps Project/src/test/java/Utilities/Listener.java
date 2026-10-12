@@ -17,7 +17,7 @@ import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
-public class Listener implements ITestListener {
+public class Listener implements ITestListener, org.testng.IConfigurationListener {
 
     // المتغيرات الاستاتيكية بالطريقة التي طلبتها
     private static ExtentReports extentReports;
