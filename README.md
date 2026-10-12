@@ -1,55 +1,92 @@
-# Swag Labs UI Automation Framework 
+# Swag Labs UI Automation Framework
 
-A production-ready, enterprise-grade **End-to-End (E2E) Automation Testing Framework** built to validate the core business workflows of the Swag Labs e-commerce platform. This project leverages the **Page Object Model (POM)** design pattern to ensure high maintainability, scalability, and clean separation of concerns.
-
----
-
-##  Business & Technical Problem
-Manual execution of critical regression suites on e-commerce platforms introduces bottlenecks in the CI/CD pipeline, increases human error, and delays time-to-market. 
-
-### The Challenges:
-* **Flaky Workflows:** E-commerce funnels (Login, Cart, Multi-step Checkout) frequently break silently due to UI changes.
-* **Test Maintenance Overhead:** Hardcoded locators and poorly structured test scripts lead to high maintenance costs when application code scales.
-* **Environmental Instability:** Using bleeding-edge or non-LTS Java runtimes causes unpredictable compiler behavior and dependency conflicts across test runner environments.
+End-to-End UI test automation for the [Swag Labs demo store](https://www.saucedemo.com) (Login, Product list, Product details, Cart and the two-step Checkout). It is built with Java, Selenium WebDriver and TestNG, using the **Page Object Model (POM)** pattern.
 
 ---
 
-## Proposed Solution & Core Features
-This framework solves the reliability gap by providing a fully automated, decoupled regression testing suite that simulates deterministic user interactions.
+## Tech Stack
 
-### Key Architecture & Implementation Details:
-* **Page Object Model (POM):** Clean decoupling of UI elements and action methods from the actual test assertions, ensuring that any UI change requires updating only a single locator file.
-* **Stable Runtime Environment:** Compiled using standard **Java 17 (LTS)** parameters to guarantee seamless, reproducible execution across local environments and headless test configurations.
-* **Robust Test Distribution:** Executions are globally managed via a unified `testng.xml` suite wrapper, supporting logical groupings (Regression, Smoke, Sanity).
-* **Rich Visual Reporting:** Integrated custom listeners backed by **ExtentReports** to deliver automated, step-by-step HTML documentation with execution statuses.
-
----
-
-## Tech Stack & Dependencies
-
-| Tool / Dependency | Version | Industry Purpose |
+| Tool | Version | Purpose |
 | :--- | :--- | :--- |
-| **Java 17 (LTS)** | `17.0.19` | Provides a bulletproof, long-term support runtime environment. |
-| **Selenium Java** | `4.39.0` | Powers W3C-compliant browser automation and explicit wait strategies. |
-| **TestNG** | `7.10.2` | Drives advanced test configuration, lifecycle hooks, and suite setups. |
-| **ExtentReports** | `5.1.1` | Generates interactive, high-level execution dashboards for stakeholders. |
-| **Maven** | Native | Automates project lifecycle management and dependency scopes. |
+| Java | 17 | Language / runtime (`maven.compiler` is set to 17) |
+| Selenium Java | 4.39.0 | Browser automation |
+| TestNG | 7.10.2 | Test runner and suite configuration |
+| ExtentReports | 5.1.1 | HTML execution report with failure screenshots |
+| Maven | 3.x | Build and dependency management |
+
+---
+
+## Prerequisites
+
+* JDK 17 or newer
+* Maven 3.x
+* Google Chrome (default), or Firefox / Edge. Selenium Manager downloads the matching driver automatically.
+
+---
+
+## Running the tests
+
+All commands run from the `Swag Laps Project/` folder (the one containing `pom.xml`).
+
+```bash
+# Default: Chrome with a visible window
+mvn test
+
+# Headless Chrome (useful for CI)
+mvn test -Dheadless=true
+
+# Another browser
+mvn test -Dbrowser=firefox
+```
+
+| Property | Values | Default |
+| :--- | :--- | :--- |
+| `browser` | `chrome`, `firefox`, `edge` | `chrome` |
+| `headless` | `true`, `false` | `false` |
+| `baseUrl` | any URL | `https://www.saucedemo.com` |
+
+`mvn test` runs the suite defined in `testng.xml` (6 test classes, one `Regression Tests` block) and registers the report listener.
+
+---
+
+## Reports
+
+After a run, an HTML report is written to `Swag Laps Project/Reports/ExecutionReport_<timestamp>.html`. Failures (including failures in setup methods) are logged with the error message and a screenshot saved under `Swag Laps Project/Screenshots/`. Both folders are git-ignored.
 
 ---
 
 ## Project Structure
 
 ```text
-src/
-├── main/java/Pages/         # Page Objects containing strictly encapsulated locators & actions
-│   ├── LoginPage.java
-│   ├── ProductListPage.java
-│   ├── ProductDetailsPage.java
-│   └── ... (CartPage, Checkout Steps)
-└── test/java/
-    ├── BaseClass/          # Driver instantiation management and dynamic browser configurations
-    ├── TestCases/          # Pure assertions verifying operational requirements
-    │   ├── LoginPageTestCases.java
-    │   ├── ProductListPage_TestCases.java
-    │   └── ProductDetailsPage_TestCases.java
-    └── Utilities/          # Enterprise test listeners and custom configuration utilities
+Swag Laps Project/
+├── pom.xml
+├── testng.xml                      # Suite definition + listener registration
+└── src/
+    ├── main/java/Pages/            # Page Objects (locators + actions)
+    │   ├── BasePage.java           # Shared explicit-wait helpers
+    │   ├── LoginPage.java
+    │   ├── ProductListPage.java
+    │   ├── ProductDetailsPage.java
+    │   ├── CartPage.java
+    │   ├── CheckoutStepOnePage.java
+    │   ├── CheckoutStepTwoPage.java
+    │   └── CheckoutCompletePage.java
+    └── test/java/
+        ├── BaseClass/BaseClass.java        # Driver setup / teardown and run configuration
+        ├── TestCases/                      # Test classes (assertions only)
+        └── Utilities/Listener.java         # ExtentReports + screenshot listener
+```
+
+---
+
+## Design notes
+
+* Page Objects hold locators and actions; test classes hold the assertions.
+* Page Objects extend `BasePage`, so every click, read and page transition uses an explicit wait instead of `Thread.sleep`.
+* Each test starts with a fresh browser session (`@BeforeMethod`) and is independent of the others.
+
+## Known limitations
+
+* Only the `standard_user` and `locked_out_user` accounts are covered; there is no `problem_user` or `performance_glitch_user` scenario yet.
+* There is no CI workflow in the repository yet.
+* Tests run sequentially; the shared static driver in `BaseClass` would need to become thread-local before enabling parallel execution.
