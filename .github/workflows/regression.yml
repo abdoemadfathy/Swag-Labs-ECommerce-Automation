@@ -36,9 +36,17 @@ jobs:
       - name: Run the TestNG suite
         id: run
         continue-on-error: true
-        run: >
-          xvfb-run --auto-servernum --server-args="-screen 0 1920x1080x24"
-          mvn -B -ntp test -Dsurefire.suiteXmlFiles=testng.xml
+        shell: bash
+        run: |
+          xvfb-run --auto-servernum --server-args="-screen 0 1920x1080x24" \
+            mvn -B -ntp test -Dsurefire.suiteXmlFiles=testng.xml 2>&1 | tee mvn.log
+
+      - name: Diagnostics
+        if: always()
+        shell: bash
+        run: |
+          { echo "--- target"; ls -R target 2>&1 | head -40; echo "--- mvn.log tail"; tail -60 mvn.log; } > diag.txt 2>&1 || true
+          printf '::notice title=diag::%s\n' "$(sed ':a;N;$!ba;s/%/%25/g;s/\r//g;s/\n/%0A/g' diag.txt)"
 
       - name: Summarise results
         if: always()
