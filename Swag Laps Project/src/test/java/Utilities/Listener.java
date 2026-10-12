@@ -82,6 +82,16 @@ public class Listener implements ITestListener {
     }
 
     @Override
+    public void onConfigurationFailure(ITestResult result) {
+        try {
+            System.out.println("[CI-DEBUG] " + result.getName() + " url=" + BaseClass.driver.getCurrentUrl()
+                    + " body=" + BaseClass.driver.getPageSource().replaceAll("\\s+", " ").substring(0, 700));
+        } catch (Exception e) {
+            System.out.println("[CI-DEBUG] " + e);
+        }
+    }
+
+    @Override
     public void onTestSkipped(ITestResult result) {
         extentTest.log(Status.SKIP, "Test Case '" + result.getName() + "' SKIPPED.");
     }
