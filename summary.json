@@ -1,0 +1,15 @@
+{
+  "schemaVersion": 1,
+  "suite": "SwagLabs Suite",
+  "total": 32,
+  "passed": 0,
+  "failed": 0,
+  "skipped": 32,
+  "status": "failed",
+  "durationMs": 17321,
+  "finishedAt": "2026-10-12T20:15:18Z",
+  "commit": "2d5277f",
+  "branch": "ci/github-actions",
+  "event": "push",
+  "runUrl": "https://github.com/abdoemadfathy/Swag-Labs-ECommerce-Automation/actions/runs/38302933417"
+}
