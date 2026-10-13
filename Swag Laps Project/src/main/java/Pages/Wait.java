@@ -41,6 +41,9 @@ final class Wait {
      */
     static void clickUntil(WebDriver driver, By locator, int index, java.util.function.Predicate<WebDriver> effect) {
         int[] attempt = {0};
+        // The implicit wait would make every "is it gone yet?" lookup block for its full length, so poll without it.
+        driver.manage().timeouts().implicitlyWait(Duration.ZERO);
+        try {
         new WebDriverWait(driver, Duration.ofSeconds(15))
                 .ignoring(StaleElementReferenceException.class)
                 .ignoring(IndexOutOfBoundsException.class)
@@ -56,5 +59,8 @@ final class Wait {
                     }
                     return effect.test(d);
                 });
+        } finally {
+            driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(10));
+        }
     }
 }

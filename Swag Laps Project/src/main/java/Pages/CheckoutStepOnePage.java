@@ -57,7 +57,7 @@ public class CheckoutStepOnePage {
     }
 
     public void clickContinue() {
-        Wait.click(driver, continueButton);
+        Wait.clickUntil(driver, continueButton, 0, d -> d.getCurrentUrl().contains("/checkout-step-two.html") || !d.findElements(errorMessageContainer).isEmpty());
     }
 
     // جلب نص رسالة الخطأ الظاهرة

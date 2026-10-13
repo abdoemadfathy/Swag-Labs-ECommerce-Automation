@@ -60,7 +60,7 @@ public class CheckoutStepTwoPage {
     }
 
     public void clickCancel() {
-        Wait.click(driver, cancelButton);
+        Wait.clickUntil(driver, cancelButton, 0, d -> d.getCurrentUrl().contains("/inventory.html"));
     }
 
     public void clickFinish() {
