@@ -118,17 +118,17 @@ jobs:
           set -e
           SUMMARY="$(find artifact -name summary.json | head -1)"
           [ -n "$SUMMARY" ] || { echo "No summary.json found"; exit 1; }
-          mkdir pub && cp "$SUMMARY" pub/summary.json && cd pub
+          mkdir pub && cd pub
           git init -q
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git remote add origin "https://x-access-token:${{ github.token }}@github.com/${{ github.repository }}.git"
           if git fetch -q --depth=1 origin ci-results; then
             git checkout -q -b ci-results FETCH_HEAD
-            cp ../"$SUMMARY" summary.json
           else
             git checkout -q --orphan ci-results
           fi
+          cp ../"$SUMMARY" summary.json
           git add summary.json
           git commit -q -m "Update CI summary" || { echo "No change"; exit 0; }
           git push -q origin ci-results
