@@ -64,6 +64,6 @@ public class CheckoutStepTwoPage {
     }
 
     public void clickFinish() {
-        Wait.click(driver, finishButton);
+        Wait.clickUntil(driver, finishButton, 0, d -> d.getCurrentUrl().contains("/checkout-complete.html") && d.getPageSource().contains("Thank you for your order!"));
     }
 }

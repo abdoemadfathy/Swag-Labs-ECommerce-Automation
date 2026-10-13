@@ -17,7 +17,7 @@ import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
-public class Listener implements ITestListener, org.testng.IConfigurationListener {
+public class Listener implements ITestListener {
 
     // المتغيرات الاستاتيكية بالطريقة التي طلبتها
     private static ExtentReports extentReports;
@@ -78,20 +78,6 @@ public class Listener implements ITestListener, org.testng.IConfigurationListene
         String screenshotPath = captureScreenshot(result.getName());
         if (screenshotPath != null) {
             extentTest.addScreenCaptureFromPath(screenshotPath);
-        }
-    }
-
-    @Override
-    public void onConfigurationFailure(ITestResult result) {
-        try {
-            System.out.println("[CI-DEBUG] " + result.getName() + " url=" + BaseClass.driver.getCurrentUrl()
-                    + " text=" + ((org.openqa.selenium.JavascriptExecutor) BaseClass.driver).executeScript(
-                            "return document.body.innerText.replace(/\\s+/g,' ').slice(0,500)")
-                    + " badges=" + BaseClass.driver.findElements(org.openqa.selenium.By.className("shopping_cart_badge")).size()
-                    + " cartLinks=" + BaseClass.driver.findElements(org.openqa.selenium.By.className("shopping_cart_link")).size()
-                    + " win=" + BaseClass.driver.manage().window().getSize());
-        } catch (Exception e) {
-            System.out.println("[CI-DEBUG] " + e);
         }
     }
 
