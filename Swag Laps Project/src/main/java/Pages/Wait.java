@@ -33,4 +33,28 @@ final class Wait {
                     return true;
                 });
     }
+
+    /**
+     * Clicks the element at {@code index} and keeps retrying (native click, then script click) until
+     * {@code effect} is true. A click that lands while the single-page app is still re-rendering can be
+     * dropped, so the action is confirmed by its visible result instead of assumed.
+     */
+    static void clickUntil(WebDriver driver, By locator, int index, java.util.function.Predicate<WebDriver> effect) {
+        int[] attempt = {0};
+        new WebDriverWait(driver, Duration.ofSeconds(15))
+                .ignoring(StaleElementReferenceException.class)
+                .ignoring(IndexOutOfBoundsException.class)
+                .until(d -> {
+                    if (attempt[0] > 0 && effect.test(d)) {
+                        return true;
+                    }
+                    WebElement element = d.findElements(locator).get(index);
+                    if (attempt[0]++ % 2 == 0) {
+                        element.click();
+                    } else {
+                        ((org.openqa.selenium.JavascriptExecutor) d).executeScript("arguments[0].click();", element);
+                    }
+                    return effect.test(d);
+                });
+    }
 }

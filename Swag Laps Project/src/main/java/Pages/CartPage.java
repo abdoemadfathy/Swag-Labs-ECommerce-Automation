@@ -45,17 +45,18 @@ public class CartPage {
 
     // الضغط على زر Remove لإزالة منتج معين من داخل السلة
     public void clickRemoveButton(int index) {
-        driver.findElements(removeButton).get(index).click();
+        int before = getCartItemsCount();
+        Wait.clickUntil(driver, removeButton, index, d -> d.findElements(cartItemName).size() < before);
     }
 
     // الضغط على زر Continue Shopping للعودة لصفحة المنتجات
     public void clickContinueShopping() {
-        Wait.click(driver, continueShoppingButton);
+        Wait.clickUntil(driver, continueShoppingButton, 0, d -> d.getCurrentUrl().contains("/inventory.html"));
     }
 
     // الضغط على زر Checkout لبدء إتمام الشراء
     public void clickCheckoutButton() {
-        Wait.click(driver, checkoutButton);
+        Wait.clickUntil(driver, checkoutButton, 0, d -> d.getCurrentUrl().contains("/checkout-step-one.html"));
     }
 
     // دالة ترجع عدد المنتجات المعروضة حالياً داخل السلة

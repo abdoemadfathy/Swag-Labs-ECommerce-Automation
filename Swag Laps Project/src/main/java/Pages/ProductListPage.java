@@ -32,12 +32,14 @@ public class ProductListPage {
 
     // الضغط على زرار Add to Cart بناءً على الـ index
     public void clickAddToCartButton(int index) {
-        driver.findElements(addToCartButtonLocator).get(index).click();
+        int before = driver.findElements(removeButtonLocator).size();
+        Wait.clickUntil(driver, addToCartButtonLocator, index, d -> d.findElements(removeButtonLocator).size() > before);
     }
 
     // الضغط على زرار Remove بناءً على الـ index
     public void clickRemoveButton(int index) {
-        driver.findElements(removeButtonLocator).get(index).click();
+        int before = driver.findElements(removeButtonLocator).size();
+        Wait.clickUntil(driver, removeButtonLocator, index, d -> d.findElements(removeButtonLocator).size() < before);
     }
 
     // جلب نص زرار الـ Remove لمنتج معين (تم تحديثها لتأخذ index عشان الدقة)
