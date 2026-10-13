@@ -43,12 +43,12 @@ public class ProductDetailsPage {
 
     // الضغط على Add to cart
     public void clickAddToCartButton() {
-        Wait.click(driver, addToCartButton);
+        Wait.clickUntil(driver, addToCartButton, 0, d -> !d.findElements(removeButton).isEmpty());
     }
 
     // الضغط على Remove
     public void clickRemoveButton() {
-        Wait.click(driver, removeButton);
+        Wait.clickUntil(driver, removeButton, 0, d -> !d.findElements(addToCartButton).isEmpty());
     }
 
     // جلب نص زرار الـ Remove للتأكد من التحول
@@ -61,7 +61,7 @@ public class ProductDetailsPage {
 
     // الضغط على زرار العودة للخلف Back to products
     public void clickBackToProducts() {
-        Wait.click(driver, backToProductsButton);
+        Wait.clickUntil(driver, backToProductsButton, 0, d -> d.getCurrentUrl().contains("/inventory.html"));
     }
 
     // جلب رقم السلة (العداد)
