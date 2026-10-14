@@ -32,12 +32,14 @@ public class ProductListPage {
 
     // الضغط على زرار Add to Cart بناءً على الـ index
     public void clickAddToCartButton(int index) {
-        driver.findElements(addToCartButtonLocator).get(index).click();
+        int before = driver.findElements(removeButtonLocator).size();
+        Wait.clickUntil(driver, addToCartButtonLocator, index, d -> d.findElements(removeButtonLocator).size() > before);
     }
 
     // الضغط على زرار Remove بناءً على الـ index
     public void clickRemoveButton(int index) {
-        driver.findElements(removeButtonLocator).get(index).click();
+        int before = driver.findElements(removeButtonLocator).size();
+        Wait.clickUntil(driver, removeButtonLocator, index, d -> d.findElements(removeButtonLocator).size() < before);
     }
 
     // جلب نص زرار الـ Remove لمنتج معين (تم تحديثها لتأخذ index عشان الدقة)
@@ -47,7 +49,7 @@ public class ProductListPage {
 
     // جلب الرقم (العدد) الظاهر على أيقونة السلة
     public String getCartBadgeText() {
-        return driver.findElement(cartBadgeLocator).getText();
+        return Wait.text(driver, cartBadgeLocator);
     }
 
     // داله  تختار الترتيب بناءً على النص اللي هتبعته ليها
@@ -61,13 +63,26 @@ public class ProductListPage {
     // استدعاء اول اسم منتج بعد الترتيب من Z الى A
     public String getFirstProductName()
     {
-       return driver.findElement(firstProductLocator_A_To_Z).getText();
+       return Wait.text(driver, firstProductLocator_A_To_Z);
     }
 
     // الضغط ع ايقونة السلة
     public void clickOnCartIcon()
     {
-        driver.findElement(CartIconLocator).click();
+        // Retry until the cart page is open: a click right after "Add to cart" can be lost while the page
+        // re-renders. Every other attempt falls back to a script click.
+        int[] attempt = {0};
+        new org.openqa.selenium.support.ui.WebDriverWait(driver, java.time.Duration.ofSeconds(15))
+                .ignoring(org.openqa.selenium.StaleElementReferenceException.class)
+                .until(d -> {
+                    WebElement icon = d.findElement(CartIconLocator);
+                    if (attempt[0]++ % 2 == 0) {
+                        icon.click();
+                    } else {
+                        ((org.openqa.selenium.JavascriptExecutor) d).executeScript("arguments[0].click();", icon);
+                    }
+                    return d.getCurrentUrl().contains("cart.html");
+                });
     }
 
 }

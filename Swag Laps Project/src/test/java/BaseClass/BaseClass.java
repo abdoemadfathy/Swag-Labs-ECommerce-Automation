@@ -2,6 +2,8 @@ package BaseClass;
 
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.chrome.ChromeDriver;
+import org.openqa.selenium.chrome.ChromeOptions;
+import java.time.Duration;
 import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeMethod;
 
@@ -11,9 +13,19 @@ public class BaseClass
     @BeforeMethod
     public void setUp()
     {
-        driver = new ChromeDriver();
+        // On CI (GitHub Actions sets CI=true) run headless with a fixed window; locally keep the visible, maximized browser.
+        boolean ci = System.getenv("CI") != null;
+        ChromeOptions options = new ChromeOptions();
+        if (ci) {
+            options.addArguments("--headless=new", "--window-size=1920,1080");
+        }
+        driver = new ChromeDriver(options);
+        // Let element lookups wait for the page to render instead of failing on timing.
+        driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(10));
         driver.get("https://www.saucedemo.com");
-        driver.manage().window().maximize();
+        if (!ci) {
+            driver.manage().window().maximize();
+        }
     }
 
     @AfterMethod

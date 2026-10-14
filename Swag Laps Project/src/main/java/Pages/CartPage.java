@@ -25,7 +25,7 @@ public class CartPage {
 
     // جلب نص عنوان الصفحة الحالي ( Your Cart)
     public String getPageTitleText() {
-        return driver.findElement(cartPageTitle).getText();
+        return Wait.text(driver, cartPageTitle);
     }
 
     // جلب اسم المنتج الموجود داخل السلة بناءً على الـ index
@@ -45,17 +45,18 @@ public class CartPage {
 
     // الضغط على زر Remove لإزالة منتج معين من داخل السلة
     public void clickRemoveButton(int index) {
-        driver.findElements(removeButton).get(index).click();
+        int before = getCartItemsCount();
+        Wait.clickUntil(driver, removeButton, index, d -> d.findElements(cartItemName).size() < before);
     }
 
     // الضغط على زر Continue Shopping للعودة لصفحة المنتجات
     public void clickContinueShopping() {
-        driver.findElement(continueShoppingButton).click();
+        Wait.clickUntil(driver, continueShoppingButton, 0, d -> d.getCurrentUrl().contains("/inventory.html"));
     }
 
     // الضغط على زر Checkout لبدء إتمام الشراء
     public void clickCheckoutButton() {
-        driver.findElement(checkoutButton).click();
+        Wait.clickUntil(driver, checkoutButton, 0, d -> d.getCurrentUrl().contains("/checkout-step-one.html"));
     }
 
     // دالة ترجع عدد المنتجات المعروضة حالياً داخل السلة

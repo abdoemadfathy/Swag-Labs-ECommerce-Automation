@@ -1,7 +1,10 @@
 package Pages;
 
 import org.openqa.selenium.By;
+import org.openqa.selenium.StaleElementReferenceException;
 import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.support.ui.WebDriverWait;
+import java.time.Duration;
 
 public class ProductDetailsPage {
 
@@ -25,41 +28,44 @@ public class ProductDetailsPage {
 
     // جلب اسم المنتج الحالي
     public String getProductName() {
-        return driver.findElement(productNameTitle).getText();
+        return Wait.text(driver, productNameTitle);
     }
 
     // جلب وصف المنتج
     public String getProductDescription() {
-        return driver.findElement(productDescriptionText).getText();
+        return Wait.text(driver, productDescriptionText);
     }
 
     // جلب سعر المنتج
     public String getProductPrice() {
-        return driver.findElement(productPriceLabel).getText();
+        return Wait.text(driver, productPriceLabel);
     }
 
     // الضغط على Add to cart
     public void clickAddToCartButton() {
-        driver.findElement(addToCartButton).click();
+        Wait.clickUntil(driver, addToCartButton, 0, d -> !d.findElements(removeButton).isEmpty());
     }
 
     // الضغط على Remove
     public void clickRemoveButton() {
-        driver.findElement(removeButton).click();
+        Wait.clickUntil(driver, removeButton, 0, d -> !d.findElements(addToCartButton).isEmpty());
     }
 
     // جلب نص زرار الـ Remove للتأكد من التحول
     public String getRemoveButtonText() {
-        return driver.findElement(removeButton).getText();
+        // The button is re-rendered after "Add to cart", so retry if the element goes stale.
+        return new WebDriverWait(driver, Duration.ofSeconds(10))
+                .ignoring(StaleElementReferenceException.class)
+                .until(d -> d.findElement(removeButton).getText());
     }
 
     // الضغط على زرار العودة للخلف Back to products
     public void clickBackToProducts() {
-        driver.findElement(backToProductsButton).click();
+        Wait.clickUntil(driver, backToProductsButton, 0, d -> d.getCurrentUrl().contains("/inventory.html"));
     }
 
     // جلب رقم السلة (العداد)
     public String getCartBadgeText() {
-        return driver.findElement(cartBadgeCounter).getText();
+        return Wait.text(driver, cartBadgeCounter);
     }
 }

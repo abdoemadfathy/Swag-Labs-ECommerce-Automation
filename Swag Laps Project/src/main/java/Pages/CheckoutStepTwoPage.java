@@ -28,42 +28,42 @@ public class CheckoutStepTwoPage {
 
     // 2. Methods
     public String getPageTitleText() {
-        return driver.findElement(pageTitle).getText();
+        return Wait.text(driver, pageTitle);
     }
 
     public String getItemNameText() {
-        return driver.findElement(itemName).getText();
+        return Wait.text(driver, itemName);
     }
 
     public String getItemPriceText() {
-        return driver.findElement(itemPrice).getText();
+        return Wait.text(driver, itemPrice);
     }
 
     public String getPaymentInfoValueText() {
-        return driver.findElement(paymentInfoValue).getText();
+        return Wait.text(driver, paymentInfoValue);
     }
 
     public String getShippingInfoValueText() {
-        return driver.findElement(shippingInfoValue).getText();
+        return Wait.text(driver, shippingInfoValue);
     }
 
     public String getItemTotalText() {
-        return driver.findElement(itemTotalLabel).getText();
+        return Wait.text(driver, itemTotalLabel);
     }
 
     public String getTaxText() {
-        return driver.findElement(taxLabel).getText();
+        return Wait.text(driver, taxLabel);
     }
 
     public String getTotalText() {
-        return driver.findElement(totalLabel).getText();
+        return Wait.text(driver, totalLabel);
     }
 
     public void clickCancel() {
-        driver.findElement(cancelButton).click();
+        Wait.clickUntil(driver, cancelButton, 0, d -> d.getCurrentUrl().contains("/inventory.html"));
     }
 
     public void clickFinish() {
-        driver.findElement(finishButton).click();
+        Wait.clickUntil(driver, finishButton, 0, d -> d.getCurrentUrl().contains("/checkout-complete.html") && d.getPageSource().contains("Thank you for your order!"));
     }
 }
