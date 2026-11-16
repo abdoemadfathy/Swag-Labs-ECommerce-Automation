@@ -2,14 +2,14 @@
   "schemaVersion": 1,
   "suite": "SwagLabs Suite",
   "total": 32,
-  "passed": 32,
-  "failed": 0,
+  "passed": 24,
+  "failed": 8,
   "skipped": 0,
-  "status": "passed",
-  "durationMs": 283857,
-  "finishedAt": "2026-11-09T15:35:19Z",
+  "status": "failed",
+  "durationMs": 372374,
+  "finishedAt": "2026-11-16T15:14:46Z",
   "commit": "aa42249",
   "branch": "main",
   "event": "schedule",
-  "runUrl": "https://github.com/abdoemadfathy/Swag-Labs-ECommerce-Automation/actions/runs/42645279299"
+  "runUrl": "https://github.com/abdoemadfathy/Swag-Labs-ECommerce-Automation/actions/runs/43893141140"
 }
